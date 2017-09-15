@@ -9,7 +9,7 @@ public class Predictor {
 
     public Predictor(){
         try {
-            SavedModelBundle smb = SavedModelBundle.load("/home/ramzan/Dropbox/PromStudy/new_model_xx", "serve");
+            SavedModelBundle smb = SavedModelBundle.load("new_model_xx", "serve");
             s = smb.session();
         } catch (Exception e) {
             e.printStackTrace();
