@@ -1,0 +1,15 @@
+#some comment
+model_output = new_model_xx
+test_results_file = output.csv
+batch_size = 16
+hidden_dims =128
+nb_epoch = 2
+pos_seq = PProm_tata_old.seq
+neg_seq = Pneg_tata_old.seq
+learning_split = 0.7
+testing_split = 0.2
+validation_split =0.1
+read_model=0
+model_file = new_model_xx
+#nb_filter, filter_length, pool_length
+architecture = 100, 7, 0,150,21,12
