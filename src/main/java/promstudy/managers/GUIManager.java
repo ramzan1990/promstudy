@@ -1,5 +1,6 @@
 package promstudy.managers;
 
+import promstudy.common.ClassAndValue;
 import promstudy.common.MDouble;
 import promstudy.main.PState;
 import promstudy.ui.GUI;
@@ -20,6 +21,7 @@ public class GUIManager {
     private GUI mainWindow;
     private String selectionClassName;
     private ArrayList<DataComponent> componentList;
+    int aIndex;
     private Object selectedComponent;
     public IOManager io;
     private Predictor p;
@@ -51,11 +53,21 @@ public class GUIManager {
     }
 
 
-    public void AccuracyHistogram(String title, int index, MDouble decisionThreshold) {
-        //AccuracyHistogram ahc = new AccuracyHistogram(decisionThreshold);
-        //ahc.setType("accuracyHistogram");
-        //componentList.add(ahc);
-        // mainWindow.createFrame("Accuracy Histogram (" + title + ")" + index, ahc);
+    public void accuracyHistogram(String title) {
+        ClassAndValue[] cav = new ClassAndValue[s.positive.length + s.negative.length];
+        int i =0;
+        float[] r = p.predict(s.positive);
+        for(float f:r){
+            cav[i++] = new ClassAndValue(1, f);
+        }
+        r = p.predict(s.negative);
+        for(float f:r){
+            cav[i++] = new ClassAndValue(0, f);
+        }
+        AccuracyHistogram ahc = new AccuracyHistogram(cav, s.decisionThreshold);
+        ahc.setType("accuracyHistogram");
+        componentList.add(ahc);
+        mainWindow.createFrame("Accuracy Histogram (" + title + ")" + aIndex++, ahc);
     }
 
     public void setBins(int n) {

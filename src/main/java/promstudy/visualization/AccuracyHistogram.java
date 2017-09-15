@@ -12,8 +12,8 @@ import java.awt.event.MouseListener;
 
 public class AccuracyHistogram extends DataComponent {
 
-	private static int numberOfBins;
-	private static String cNames[] = new String[]{"Promoters", "Non-promoters"};
+	private static int numberOfBins = 50;
+	private static String cNames[] = new String[]{"Non-promoters", "Promoters"};
 	private static boolean histogramShape;
 	private static boolean roc;
 	private int maxCount, tp, tn, fp, fn, class1Len, class2Len, te;
@@ -51,6 +51,7 @@ public class AccuracyHistogram extends DataComponent {
 			public void mouseExited(MouseEvent e) {
 			}
 		});
+		refresh();
 	}
 
 	public static void setBins(int n) {
@@ -62,12 +63,7 @@ public class AccuracyHistogram extends DataComponent {
 		cc = sn = sp = fs = 0;
 		r1 = r2 = p1 = p2 = 0;
 		for (int i = 0; i < cav.length; i++) {
-			int c;
-			if (cav[i].classIndex == classes[0]) {
-				c = 0;
-			} else {
-				c = 1;
-			}
+			int c = cav[i].classIndex;
 			if (cav[i].value > decThreshold.value) {
 				if (c == 0) {
 					fp++;
@@ -123,7 +119,7 @@ public class AccuracyHistogram extends DataComponent {
 		binSize = (maxX - minX) / (numberOfBins - 1);
 		for (int i = 0; i < cav.length; i++) {
 			int c;
-			if (cav[i].classIndex == classes[0]) {
+			if (cav[i].classIndex == 0) {
 				c = 0;
 				class1Len++;
 			} else {

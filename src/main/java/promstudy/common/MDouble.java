@@ -14,6 +14,10 @@ public class MDouble implements Comparable, Serializable{
 
     public double value = 0;
 
+    public MDouble(double value){
+        this.value = value;
+    }
+
     public int compareTo(Object o) {
         MDouble a = (MDouble) o;
         if(this.value > a.value)

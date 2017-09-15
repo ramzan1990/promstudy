@@ -40,7 +40,7 @@ public class GUI extends PSFrame {
         JMenuItem loadData = new JMenuItem("Load Data");
         JMenuItem dataSummary= new JMenuItem("Data Summary");
         JMenuItem predict = new JMenuItem("Predict");
-        JMenuItem importanceAnalysis = new JMenuItem("Importance Analysis");
+        JMenuItem accuracyHistogram = new JMenuItem("Accuracy Histogram");
         JMenuItem  Help = new JMenuItem("Help");
         JMenuItem About = new JMenuItem("About");
         JMenuItem ClearConsole = new JMenuItem("Clear console");
@@ -80,8 +80,12 @@ public class GUI extends PSFrame {
             }
         });
 
-        draw.add(importanceAnalysis);
-
+        draw.add(accuracyHistogram);
+        accuracyHistogram.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                manager.accuracyHistogram("");
+            }
+        });
 
         HideConsole.setSelected(true);
         HideConsole.addActionListener(new ActionListener() {
