@@ -7,6 +7,7 @@ import promstudy.ui.GUI;
 import promstudy.ui.PSFrame;
 import promstudy.visualization.AccuracyHistogram;
 import promstudy.visualization.DataComponent;
+import promstudy.visualization.Trend;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -21,7 +22,7 @@ public class GUIManager {
     private GUI mainWindow;
     private String selectionClassName;
     private ArrayList<DataComponent> componentList;
-    int aIndex;
+    private int aIndex, tIndex;
     private Object selectedComponent;
     public IOManager io;
     private Predictor p;
@@ -32,6 +33,8 @@ public class GUIManager {
         this.io = io;
         this.p = p;
         this.s = s;
+        aIndex = 1;
+        tIndex = 1;
         componentList = new ArrayList<DataComponent>();
     }
 
@@ -65,7 +68,6 @@ public class GUIManager {
             cav[i++] = new ClassAndValue(0, f);
         }
         AccuracyHistogram ahc = new AccuracyHistogram(cav, s.decisionThreshold);
-        ahc.setType("accuracyHistogram");
         componentList.add(ahc);
         mainWindow.createFrame("Accuracy Histogram (" + title + ")" + aIndex++, ahc);
     }
@@ -190,6 +192,40 @@ public class GUIManager {
         writeToConsole("Non-promoters");
         for (int i = 0; i < r.length; i++) {
             writeToConsole("Score -- " + r[i]);
+        }
+    }
+
+    public void analyse() {
+        String inp = JOptionPane.showInputDialog("Select range from 1 to " + s.sequences.length+" (start, end): ");
+        int start = Integer.parseInt(inp.split(",")[0]) - 1;
+        int end = Integer.parseInt(inp.split(",")[1]);
+        ArrayList<ArrayList<Double>> arrays = new ArrayList<>();
+        ArrayList<String> names = new ArrayList<>();
+        for(int i = start; i<end; i++){
+            ArrayList<Double> list = new ArrayList<>();
+            names.add(""+(i+1));
+            float[][] seq = s.sequences[i];
+            int total = (int) Math.floor((seq.length - s.sLen)/s.step);
+            float[][][] toPredict = new float[total][s.sLen][4];
+            for(int j=0; j<toPredict.length; j++){
+                toPredict[j] = Arrays.copyOfRange(seq, j*s.step, j*s.step + s.sLen);
+            }
+            float[] r = p.predict(toPredict);
+            for(float f: r){
+                list.add(new Double(f));
+            }
+            arrays.add(list);
+        }
+        Trend t = new Trend(arrays, names);
+        componentList.add(t);
+        mainWindow.createFrame("Analysis ("+start + ", "+ end + ") " + tIndex++, t);
+    }
+
+    public void chooseStep() {
+        try{
+            s.step = Integer.parseInt(JOptionPane.showInputDialog("Choose window step size: "));
+        }catch (Exception e){
+
         }
     }
 }

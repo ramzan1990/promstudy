@@ -30,38 +30,63 @@ public class GUI extends PSFrame {
         this.manager = manager;
         // <editor-fold defaultstate="collapsed" desc="menu">
         JMenuBar menu = new JMenuBar();
-        JMenu file = new JMenu("file");
+        JMenu file = new JMenu("File");
         JMenu helpM = new JMenu("Help");
-        JMenu options = new JMenu("options");
-        JMenu data = new JMenu("data");
-        JMenu window = new JMenu("window");
-        JMenu draw = new JMenu("draw");
-        JMenuItem exit = new JMenuItem("exit");
-        JMenuItem loadData = new JMenuItem("Load Data");
+        JMenu options = new JMenu("Options");
+        JMenu data = new JMenu("Data");
+        JMenu window = new JMenu("Window");
+        JMenu analysis = new JMenu("Analysis");
+        JMenuItem analyse = new JMenuItem("Analyse");
+        JMenuItem chooseStep = new JMenuItem("Choose Step");
+        JMenuItem exit = new JMenuItem("Exit");
+        JMenuItem loadData = new JMenuItem("Load Test Data");
+        JMenuItem loadLData = new JMenuItem("Load Sequences");
         JMenuItem dataSummary= new JMenuItem("Data Summary");
         JMenuItem predict = new JMenuItem("Predict");
         JMenuItem accuracyHistogram = new JMenuItem("Accuracy Histogram");
         JMenuItem  Help = new JMenuItem("Help");
         JMenuItem About = new JMenuItem("About");
         JMenuItem ClearConsole = new JMenuItem("Clear console");
-
         final JCheckBoxMenuItem HideDataPanel = new JCheckBoxMenuItem("Data Panel");
         final JCheckBoxMenuItem HideTools = new JCheckBoxMenuItem("Tools Panel");
         final JCheckBoxMenuItem HideConsole = new JCheckBoxMenuItem("Console");
         JMenuItem Tile = new JMenuItem("Tile");
         JMenuItem Cascade = new JMenuItem("Cascade");
 
+
+        options.add(chooseStep);
+        chooseStep.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                manager.chooseStep();
+            }
+        });
         file.add(exit);
         exit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 System.exit(0);
             }
         });
+        analysis.add(predict);
+        analysis.add(accuracyHistogram);
+        analysis.addSeparator();
+        analysis.add(analyse);
+
+        analyse.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                manager.analyse();
+            }
+        });
         data.add(loadData);
+        data.add(loadLData);
         data.add(dataSummary);
-        data.add(predict);
 
 
+        loadLData.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                manager.io.loadLData();
+
+            }
+        });
         loadData.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 manager.io.loadData();
@@ -80,7 +105,7 @@ public class GUI extends PSFrame {
             }
         });
 
-        draw.add(accuracyHistogram);
+
         accuracyHistogram.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 manager.accuracyHistogram("");
@@ -221,7 +246,7 @@ public class GUI extends PSFrame {
 
         menu.add(file);
         menu.add(data);
-        menu.add(draw);
+        menu.add(analysis);
         menu.add(options);
         menu.add(window);
         menu.add(helpM);
@@ -347,6 +372,28 @@ public class GUI extends PSFrame {
                 pointSizeDec.setIcon(new ImageIcon(PromStudy.class.getResource("/images/sizeDec.png")));
             }
         });
+        final JLabel  snapShotLabel = new JLabel();
+        snapShotLabel.setIcon(new ImageIcon(PromStudy.class.getResource("/images/camera.png")));
+        snapShotLabel.setToolTipText("Take Snapshot");
+        snapShotLabel.addMouseListener(new MouseListener() {
+            public void mouseClicked(MouseEvent e) {
+                manager.takeSnapshot();
+            }
+
+            public void mousePressed(MouseEvent e) {
+            }
+
+            public void mouseReleased(MouseEvent e) {
+            }
+
+            public void mouseEntered(MouseEvent e) {
+                snapShotLabel.setIcon(new ImageIcon(PromStudy.class.getResource("/images/cameraRollover.png")));
+            }
+
+            public void mouseExited(MouseEvent e) {
+                snapShotLabel.setIcon(new ImageIcon(PromStudy.class.getResource("/images/camera.png")));
+            }
+        });
 
         toolsPanel = new JToolBar();
 
@@ -356,7 +403,17 @@ public class GUI extends PSFrame {
         toolsPanel.add(loadDataLabel);
         toolsPanel.add(Box.createRigidArea(new Dimension(10, 0)));
         toolsPanel.addSeparator();
-
+        toolsPanel.add(zoomIn);
+        toolsPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+        toolsPanel.add(zoomOut);
+        toolsPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+        toolsPanel.addSeparator();
+        toolsPanel.add(pointSizeInc);
+        toolsPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+        toolsPanel.add(pointSizeDec);
+        toolsPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+        toolsPanel.addSeparator();
+        toolsPanel.add(snapShotLabel);
         //</editor-fold>
 
         dataPanel = new JPanel();

@@ -40,6 +40,18 @@ public class IOManager {
         }
     }
 
+    public void loadLData() {
+        try {
+            FileDialog fd = new FileDialog((Frame) null, "Open file", FileDialog.LOAD);
+            fd.setVisible(true);
+            if (fd.getFiles().length > 0) {
+                s.sequences = FastaParser.parse(fd.getFiles()[0]);
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Cannot read the file!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
     public void takeSnapshot(JComponent selectedComponent) {
         try {
             FileDialog fd = new FileDialog((Frame) null, "Save Snapshot", FileDialog.SAVE);
