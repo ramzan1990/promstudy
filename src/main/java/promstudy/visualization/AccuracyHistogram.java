@@ -2,6 +2,8 @@ package promstudy.visualization;
 
 import promstudy.common.ClassAndValue;
 import promstudy.common.MDouble;
+import promstudy.main.PromStudy;
+import promstudy.managers.GUIManager;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -9,23 +11,27 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Arrays;
 
 public class AccuracyHistogram extends DataComponent {
 
 	private static int numberOfBins = 50;
 	private static String cNames[] = new String[]{"Non-promoters", "Promoters"};
 	private static boolean histogramShape;
-	private static boolean roc;
+	private static boolean roc = true;
 	private int maxCount, tp, tn, fp, fn, class1Len, class2Len, te;
 	private int[][] points;
 	private double maxX, minX, binSize, cc, sn, sp, pc, fs, r1, r2, p1, p2;
 	private ClassAndValue cav[];
 	private MDouble decThreshold;
+	GUIManager gm;
 
 
-	public AccuracyHistogram(ClassAndValue[] ldf, MDouble l) {
+	public AccuracyHistogram(ClassAndValue[] ldf, MDouble l, GUIManager gm) {
 		super("accuracyHistogram");
+		this.gm = gm;
 		this.cav = ldf;
+        Arrays.sort(cav);
 		this.decThreshold = l;
 		addMouseListener(new MouseListener() {
 
@@ -34,7 +40,7 @@ public class AccuracyHistogram extends DataComponent {
 					click(e.getX());
 				} else {
 					decThreshold.value = 0;
-					//PromStudy.gm.updateAccuracyHistograms();
+					gm.updateAccuracyHistograms();
 				}
 
 			}
@@ -303,7 +309,7 @@ public class AccuracyHistogram extends DataComponent {
 		if (roc) {
 			// ROC curve
 			g2d.setStroke(new BasicStroke(1));
-			g2d.setColor(Color.BLACK);
+			g2d.setColor(Color.YELLOW);
 			int numberOfPoints1, numberOfPoints2, c1 = 0, c2 = 0;
 			int x0, x, y0, y, xd = 0, yd = 0;
 			double min;
@@ -321,10 +327,10 @@ public class AccuracyHistogram extends DataComponent {
 				numberOfPoints2 = 1;
 			}
 			for (int i = 0; i < cav.length; i++) {
-				if (cav[i].classIndex == classes[0]) {
+				if (cav[i].classIndex == 0) {
 					c1++;
 				}
-				if (cav[i].classIndex == classes[1]) {
+				if (cav[i].classIndex == 1) {
 					c2++;
 				}
 				if (c1 == numberOfPoints1) {
@@ -360,7 +366,7 @@ public class AccuracyHistogram extends DataComponent {
 
 	public void click(int ex) {
 		decThreshold.value = (ex - step) / xStep + minX;
-		//Visan.gm.updateAccuracyHistograms();
+        gm.updateAccuracyHistograms();
 	}
 
 	@Override

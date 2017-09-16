@@ -33,9 +33,11 @@ public class GUI extends PSFrame {
         JMenu file = new JMenu("File");
         JMenu helpM = new JMenu("Help");
         JMenu options = new JMenu("Options");
+        JMenu optionsGraphics = new JMenu("Graphics");
         JMenu data = new JMenu("Data");
         JMenu window = new JMenu("Window");
         JMenu analysis = new JMenu("Analysis");
+        JMenuItem chooseBins = new JMenuItem("Choose Bins");
         JMenuItem analyse = new JMenuItem("Analyse");
         JMenuItem chooseStep = new JMenuItem("Choose Step");
         JMenuItem exit = new JMenuItem("Exit");
@@ -50,16 +52,38 @@ public class GUI extends PSFrame {
         final JCheckBoxMenuItem HideDataPanel = new JCheckBoxMenuItem("Data Panel");
         final JCheckBoxMenuItem HideTools = new JCheckBoxMenuItem("Tools Panel");
         final JCheckBoxMenuItem HideConsole = new JCheckBoxMenuItem("Console");
+        final JCheckBoxMenuItem whiteTheme = new JCheckBoxMenuItem("White Theme");
+        final JCheckBoxMenuItem ROCCurve = new JCheckBoxMenuItem("ROCCurve");
         JMenuItem Tile = new JMenuItem("Tile");
         JMenuItem Cascade = new JMenuItem("Cascade");
 
-
+        options.add(optionsGraphics);
+        optionsGraphics.add(whiteTheme);
+        optionsGraphics.add(chooseBins);
+        chooseBins.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                manager.chooseBins();
+            }
+        });
+        whiteTheme.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                manager.setTheme(whiteTheme.isSelected());
+            }
+        });
         options.add(chooseStep);
         chooseStep.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 manager.chooseStep();
             }
         });
+        options.add(ROCCurve);
+        ROCCurve.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                manager.ROCCurve(ROCCurve.isSelected());
+            }
+        });
+        ROCCurve.setState(true);
+
         file.add(exit);
         exit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
@@ -108,7 +132,7 @@ public class GUI extends PSFrame {
 
         accuracyHistogram.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                manager.accuracyHistogram("");
+                manager.accuracyHistogram();
             }
         });
 
@@ -422,15 +446,10 @@ public class GUI extends PSFrame {
         dataPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
         JPanel labelPan1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        labelPan1.add(new JLabel("Classes"));
+        labelPan1.add(new JLabel("Nothing here yet."));
 
         dataPanel.add(labelPan1);
         dataPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-
-        JPanel labelPan2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        labelPan2.add(new JLabel("Features"));
-
-        dataPanel.add(labelPan2);
 
 
         workSpacePanel = new JDesktopPane();

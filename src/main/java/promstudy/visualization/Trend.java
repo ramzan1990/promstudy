@@ -49,7 +49,7 @@ public class Trend extends DataComponent {
 		g2d.setColor(backgroundColor);
 		g2d.fillRect(0, 0, width, height + step);
 
-		int n = scale / 2 + 1;
+		int n = 2;
 
 		// x-axis
 		xPoint = (double) maxCount / ((width - step) / step);

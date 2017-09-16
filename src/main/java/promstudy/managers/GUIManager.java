@@ -1,22 +1,17 @@
 package promstudy.managers;
 
 import promstudy.common.ClassAndValue;
-import promstudy.common.MDouble;
 import promstudy.main.PState;
 import promstudy.ui.GUI;
-import promstudy.ui.PSFrame;
 import promstudy.visualization.AccuracyHistogram;
 import promstudy.visualization.DataComponent;
 import promstudy.visualization.Trend;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Scanner;
 
 public class GUIManager {
     private GUI mainWindow;
@@ -56,7 +51,7 @@ public class GUIManager {
     }
 
 
-    public void accuracyHistogram(String title) {
+    public void accuracyHistogram() {
         ClassAndValue[] cav = new ClassAndValue[s.positive.length + s.negative.length];
         int i =0;
         float[] r = p.predict(s.positive);
@@ -67,12 +62,12 @@ public class GUIManager {
         for(float f:r){
             cav[i++] = new ClassAndValue(0, f);
         }
-        AccuracyHistogram ahc = new AccuracyHistogram(cav, s.decisionThreshold);
+        AccuracyHistogram ahc = new AccuracyHistogram(cav, s.decisionThreshold, this);
         componentList.add(ahc);
-        mainWindow.createFrame("Accuracy Histogram (" + title + ")" + aIndex++, ahc);
+        mainWindow.createFrame("Accuracy Histogram " + aIndex++, ahc);
     }
 
-    public void setBins(int n) {
+    public void chooseBins(int n) {
         AccuracyHistogram.setBins(n);
         for (int i = 0; i < componentList.size(); i++) {
             if (componentList.get(i).getType().contains("accuracyHistogram")) {
@@ -82,9 +77,9 @@ public class GUIManager {
         }
     }
 
-    public void setBins() {
+    public void chooseBins() {
         try {
-            setBins(Integer.parseInt(JOptionPane.showInputDialog("Number:")));
+            chooseBins(Integer.parseInt(JOptionPane.showInputDialog("Number:")));
         } catch (Exception e) {
         }
     }
@@ -228,4 +223,25 @@ public class GUIManager {
 
         }
     }
+
+    public void setTheme(boolean white) {
+        if(white) {
+            DataComponent.setWhiteTheme();
+        }else{
+            DataComponent.setBlackTheme();
+        }
+        for (Component c:componentList) {
+            c.repaint();
+        }
+    }
+
+    public void ROCCurve(boolean roc) {
+        AccuracyHistogram.setROC(roc);
+        for (DataComponent c:componentList) {
+            if (c.getType().equals("accuracyHistogram")) {
+                c.repaint();
+            }
+        }
+    }
+
 }

@@ -8,7 +8,6 @@ import javax.swing.JComponent;
 public abstract class DataComponent extends JComponent {
 
     protected int scale = 1, margin = 50, dotSize = 3, step = 50, width, height;
-    protected int[] classes, features;
     protected Color[] colors;
     protected RenderingHints renderHints;
     protected static Color backgroundColor = new Color(23, 25, 29);
@@ -32,14 +31,6 @@ public abstract class DataComponent extends JComponent {
         backgroundColor = Color.WHITE;
         gridColor = Color.LIGHT_GRAY;
         textColor = Color.BLACK;
-    }
-
-    public int[] getClassIndices() {
-        return classes;
-    }
-
-    public int[] getFeatureIndices() {
-        return features;
     }
 
     public String getType() {
