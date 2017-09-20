@@ -177,7 +177,7 @@ public class GUIManager {
         }
     }
 
-    public void predict() {
+    public void testData() {
         float[] r = p.predict(s.positive);
         writeToConsole("Promoters");
         for (int i = 0; i < r.length; i++) {
@@ -244,4 +244,12 @@ public class GUIManager {
         }
     }
 
+    public void classify() {
+        float[][][] toClassify = io.readData();
+        float[] r = p.predict(toClassify);
+        writeToConsole("Classification Results:");
+        for (int i = 0; i < r.length; i++) {
+            writeToConsole("Score -- " + r[i]);
+        }
+    }
 }

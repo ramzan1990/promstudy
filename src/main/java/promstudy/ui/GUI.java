@@ -44,6 +44,7 @@ public class GUI extends PSFrame {
         JMenuItem loadData = new JMenuItem("Load Test Data");
         JMenuItem loadLData = new JMenuItem("Load Sequences");
         JMenuItem dataSummary= new JMenuItem("Data Summary");
+        JMenuItem testData = new JMenuItem("Test Data");
         JMenuItem predict = new JMenuItem("Predict");
         JMenuItem accuracyHistogram = new JMenuItem("Accuracy Histogram");
         JMenuItem  Help = new JMenuItem("Help");
@@ -90,10 +91,17 @@ public class GUI extends PSFrame {
                 System.exit(0);
             }
         });
-        analysis.add(predict);
+        analysis.add(testData);
         analysis.add(accuracyHistogram);
+        analysis.add(predict);
         analysis.addSeparator();
         analysis.add(analyse);
+
+        predict.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                manager.classify();
+            }
+        });
 
         analyse.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
@@ -123,9 +131,9 @@ public class GUI extends PSFrame {
             }
         });
 
-        predict.addActionListener(new ActionListener() {
+        testData.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                manager.predict();
+                manager.testData();
             }
         });
 

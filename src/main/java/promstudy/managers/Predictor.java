@@ -12,6 +12,15 @@ public class Predictor {
             SavedModelBundle smb = SavedModelBundle.load("new_model_xx", "serve");
             s = smb.session();
         } catch (Exception e) {
+            //e.printStackTrace();
+        }
+    }
+
+    public Predictor(String parameter) {
+        try {
+            SavedModelBundle smb = SavedModelBundle.load(parameter, "serve");
+            s = smb.session();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

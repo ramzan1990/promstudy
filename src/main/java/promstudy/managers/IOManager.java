@@ -2,7 +2,6 @@ package promstudy.managers;
 
 import promstudy.common.FastaParser;
 import promstudy.main.PState;
-import promstudy.ui.PSFrame;
 import promstudy.visualization.DataComponent;
 
 import javax.imageio.ImageIO;
@@ -10,7 +9,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.Scanner;
 
 
 public class IOManager {
@@ -22,6 +20,19 @@ public class IOManager {
         fcDir = new File(System.getProperty("user.dir"));
     }
 
+
+    public float[][][] readData() {
+        try {
+            FileDialog fd = new FileDialog((Frame) null, "Open file for classification", FileDialog.LOAD);
+            fd.setVisible(true);
+            if (fd.getFiles().length > 0) {
+                return FastaParser.parse(fd.getFiles()[0]);
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Cannot read the file!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        return null;
+    }
 
     public void loadData() {
         try {
