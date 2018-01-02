@@ -1,7 +1,6 @@
 package promstudy.visualization;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.util.ArrayList;
 
 public class Trend extends DataComponent {
@@ -10,12 +9,14 @@ public class Trend extends DataComponent {
 	private double max, min;
 	private ArrayList<ArrayList<Double>> arrays;
 	private ArrayList<String> names;
+	private int wStep;
 
 	public Trend(ArrayList<ArrayList<Double>> arrays,
-			ArrayList<String> names) {
+			ArrayList<String> names, int wStep) {
 		super("trend");
 		this.arrays = arrays;
 		this.names = names;
+		this.wStep = wStep;
 		refresh();
 	}
 
@@ -61,7 +62,7 @@ public class Trend extends DataComponent {
 			g2d.setColor(gridColor);
 			g2d.drawLine(i, height, i, 0);
 			g2d.setColor(textColor);
-			double val = (xPoint * (i - step) / step);
+			double val = (xPoint * (i - step) / step) * wStep;
 			String value = String.valueOf(val);
 			if (value.endsWith(".0")) {
 				value = value.substring(0, value.length() - 2);
@@ -99,9 +100,11 @@ public class Trend extends DataComponent {
 					+ 20 * (i % 2) + step);
 			for (int j = 0; j < arrays.get(i).size(); j++) {
 				double v = arrays.get(i).get(j);
+				g2d.setColor(new Color(g2d.getColor().getRed(), g2d.getColor().getGreen(), g2d.getColor().getBlue(), 5));
 				g2d.fillRect((int) (j * xStep + step) - dotSize / 2, height
 						- (int) Math.round(yStep * (v - min)) - dotSize / 2,
 						dotSize, dotSize);
+				g2d.setColor(colors[i % colors.length]);
 				if (j < arrays.get(i).size() - 1) {
 					double v2 = arrays.get(i).get(j + 1);
 					g2d.drawLine((int) (j * xStep + step),
@@ -136,4 +139,8 @@ public class Trend extends DataComponent {
 		}
 
 	}
+
+	public ArrayList<ArrayList<Double>> getArrays(){
+	    return arrays;
+    }
 }

@@ -37,12 +37,14 @@ public class GUI extends PSFrame {
         JMenu data = new JMenu("Data");
         JMenu window = new JMenu("Window");
         JMenu analysis = new JMenu("Analysis");
+        JMenuItem saveTrends = new JMenuItem("Save Trends");
         JMenuItem chooseBins = new JMenuItem("Choose Bins");
-        JMenuItem analyse = new JMenuItem("Analyse");
+        JMenuItem analyse = new JMenuItem("Analyse Long Sequences");
+        JMenuItem loadModel = new JMenuItem("Load Model");
         JMenuItem chooseStep = new JMenuItem("Choose Step");
         JMenuItem exit = new JMenuItem("Exit");
         JMenuItem loadData = new JMenuItem("Load Test Data");
-        JMenuItem loadLData = new JMenuItem("Load Sequences");
+        JMenuItem loadLData = new JMenuItem("Load Long Sequences");
         JMenuItem dataSummary= new JMenuItem("Data Summary");
         JMenuItem testData = new JMenuItem("Test Data");
         JMenuItem predict = new JMenuItem("Predict");
@@ -55,6 +57,7 @@ public class GUI extends PSFrame {
         final JCheckBoxMenuItem HideConsole = new JCheckBoxMenuItem("Console");
         final JCheckBoxMenuItem whiteTheme = new JCheckBoxMenuItem("White Theme");
         final JCheckBoxMenuItem ROCCurve = new JCheckBoxMenuItem("ROCCurve");
+        final JCheckBoxMenuItem total = new JCheckBoxMenuItem("Show Total");
         JMenuItem Tile = new JMenuItem("Tile");
         JMenuItem Cascade = new JMenuItem("Cascade");
 
@@ -84,8 +87,29 @@ public class GUI extends PSFrame {
             }
         });
         ROCCurve.setState(true);
+        options.add(total);
+        total.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                manager.setTotalOption(total.isSelected());
+            }
+        });
+
+
+        file.add(loadModel);
+        loadModel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                manager.loadModel();
+            }
+        });
+        file.add(saveTrends);
+        saveTrends.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                manager.saveTrends();
+            }
+        });
 
         file.add(exit);
+
         exit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 System.exit(0);
@@ -96,6 +120,7 @@ public class GUI extends PSFrame {
         analysis.add(predict);
         analysis.addSeparator();
         analysis.add(analyse);
+
 
         predict.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
@@ -108,6 +133,7 @@ public class GUI extends PSFrame {
                 manager.analyse();
             }
         });
+
         data.add(loadData);
         data.add(loadLData);
         data.add(dataSummary);

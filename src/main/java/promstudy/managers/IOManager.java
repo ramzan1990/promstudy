@@ -2,6 +2,7 @@ package promstudy.managers;
 
 import promstudy.common.FastaParser;
 import promstudy.main.PState;
+import promstudy.main.PromStudy;
 import promstudy.visualization.DataComponent;
 
 import javax.imageio.ImageIO;
@@ -9,6 +10,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 
 public class IOManager {
@@ -110,4 +114,31 @@ public class IOManager {
     }
 
 
+    public String loadModel() {
+        try {
+            JFileChooser chooser = new JFileChooser();
+            chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            chooser.setAcceptAllFileFilterUsed(false);
+
+            if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                return chooser.getSelectedFile().toString();
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Cannot read the file!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        return null;
+    }
+
+    public void saveCSV(String s) {
+        FileDialog fd = new FileDialog((Frame) null, "Save", FileDialog.SAVE);
+        fd.setVisible(true);
+        if (fd.getFiles().length > 0) {
+            File f = fd.getFiles()[0];
+            try {
+                Files.write(Paths.get(f.getAbsolutePath()), s.getBytes(), StandardOpenOption.CREATE);
+            }catch(Exception e){
+
+            }
+        }
+    }
 }

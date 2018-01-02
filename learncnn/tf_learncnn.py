@@ -43,8 +43,8 @@ def encode(s):
 
 np.random.seed(2504) 
 
-total = len(sys.argv)
-if total != 2:
+totalOption = len(sys.argv)
+if totalOption != 2:
     print('USAGE: <parameters file>')
     exit(0)
 

@@ -22,6 +22,7 @@ public class GUIManager {
     public IOManager io;
     private Predictor p;
     private PState s;
+    private boolean totalOption;
 
 
     public GUIManager(IOManager io, Predictor p, PState s) {
@@ -200,20 +201,191 @@ public class GUIManager {
             ArrayList<Double> list = new ArrayList<>();
             names.add(""+(i+1));
             float[][] seq = s.sequences[i];
-            int total = (int) Math.floor((seq.length - s.sLen)/s.step);
+            int total = (int) Math.ceil((seq.length - s.sLen)/s.step) + 1;
             float[][][] toPredict = new float[total][s.sLen][4];
             for(int j=0; j<toPredict.length; j++){
                 toPredict[j] = Arrays.copyOfRange(seq, j*s.step, j*s.step + s.sLen);
             }
             float[] r = p.predict(toPredict);
-            for(float f: r){
-                list.add(new Double(f));
+            if(!totalOption) {
+                for (float f : r) {
+                    list.add(new Double(f));
+                }
+                arrays.add(list);
+            }else{
+                if(arrays.isEmpty()){
+                    for (float f : r) {
+                        list.add(new Double(f));
+                    }
+                    arrays.add(list);
+                }else{
+                    for(int k=0;k<r.length;k++){
+                        arrays.get(0).set(k, arrays.get(0).get(k)+r[k]);
+                    }
+                }
             }
-            arrays.add(list);
         }
-        Trend t = new Trend(arrays, names);
-        componentList.add(t);
-        mainWindow.createFrame("Analysis ("+start + ", "+ end + ") " + tIndex++, t);
+        Trend trend = new Trend(arrays, names, s.step);
+        componentList.add(trend);
+        mainWindow.createFrame("Analysis ("+start + ", "+ end + ") " + tIndex++, trend);
+
+        for(int ari=0; ari<arrays.size(); ari++){
+            writeToConsole("Array "+ari);
+            ArrayList<Double> ar = arrays.get(ari);
+            int K = 2;
+            int T = ar.size();
+            int N = 3;
+            double[][] A = new  double[K][K];
+            A[0][0]= 0.95;
+            A[0][1]= 0.05;
+            A[1][1]= 0.01;
+            A[1][0]= 0.99;
+            double[][] B = new  double[K][N];
+            B[0][0]= 0.70;
+            B[0][1]= 0.19;
+            B[0][2]= 0.01;
+            B[1][0]= 0.01;
+            B[1][1]= 0.09;
+            B[1][2]= 0.90;
+            double[] p = new double[2];
+            p[0]=0.99;
+            p[1]= 0.01;
+            int[] observations = new int[ar.size()];
+            for(int i = 0; i<ar.size();i++){
+                if(ar.get(i)>0.7){
+                    observations[i] = 2;
+                }else  if(ar.get(i)>0.3){
+                    observations[i] = 1;
+                }else  {
+                    observations[i] = 0;
+                }
+            }
+            //Baum-Welch
+            int iterations = 5;
+            for(int it = 0; it<iterations; it++) {
+                //Viterbi
+                double[][] T1 = new double[K][T];
+                int[][] T2 = new int[K][T];
+
+                for (int i = 0; i < K; i++) {
+                    T1[i][0] = p[i] * B[i][observations[1]];
+                }
+                for (int i = 1; i < observations.length; i++) {
+                    for (int j = 0; j < K; j++) {
+                        double k1 = T1[0][i - 1] * A[0][j] * B[j][observations[i]];
+                        double k2 = T1[1][i - 1] * A[1][j] * B[j][observations[i]];
+                        T1[j][i] = Math.max(k1, k2);
+                        if (k2 > k1) {
+                            T2[j][i] = 1;
+                        }
+                    }
+                }
+                int[] z = new int[T];
+                if (T1[1][T - 1] > T1[0][T - 1]) {
+                    z[T - 1] = 1;
+                }
+                int[] x = new int[T];
+                x[T - 1] = z[T - 1];
+                for (int i = T - 1; i > 0; i--) {
+                    z[i - 1] = T2[z[i]][i];
+                    x[i - 1] = z[i - 1];
+                }
+                String st = "";
+                for (int i = 0; i < x.length; i++) {
+                    if (x[i] == 0) {
+                        st += "-";
+                    } else {
+                        st += "+";
+                    }
+                }
+                writeToConsole(st);
+
+                double[][] a = new double[K][T];
+                double[][] b = new double[K][T];
+                //forward
+                for (int i = 0; i < K; i++) {
+                    a[i][0] = p[i] * B[i][observations[0]];
+                }
+                for (int t = 1; t < observations.length; t++) {
+                    for (int i = 0; i < K; i++) {
+                        double sum = 0;
+                        for (int j = 0; j < K; j++) {
+                            sum += a[j][t - 1] * A[j][i];
+                        }
+                        a[i][t] = B[i][observations[t]] * sum;
+                    }
+                }
+                //backward
+                for (int i = 0; i < K; i++) {
+                    b[i][T - 1] = 1;
+                }
+                for (int t = T - 2; t >= 0; t--) {
+                    for (int i = 0; i < K; i++) {
+                        double sum = 0;
+                        for (int j = 0; j < K; j++) {
+                            sum += b[j][t + 1] * A[i][j] * B[j][observations[t + 1]];
+                        }
+                        b[i][t] = sum;
+                    }
+                }
+                //update
+                double[][] y = new double[K][T];
+                double[][][] e = new double[K][K][T - 1];
+                for (int t = 0; t < observations.length; t++) {
+                    for (int i = 0; i < K; i++) {
+                        double sum = 0;
+                        for (int j = 0; j < K; j++) {
+                            sum += a[j][t] * b[j][t];
+                        }
+                        y[i][t] = a[i][t] * b[i][t] / sum;
+                    }
+                }
+
+                for (int t = 0; t < observations.length - 1; t++) {
+                    for (int i = 0; i < K; i++) {
+                        for (int j = 0; j < K; j++) {
+                            double sum = 0;
+                            for (int ii = 0; ii < K; ii++) {
+                                for (int jj = 0; jj < K; jj++) {
+                                    sum += a[ii][t] * A[ii][jj] * b[jj][t + 1] * B[jj][observations[t + 1]];
+                                }
+                            }
+                            e[i][j][t] = a[i][t] * A[i][j] * b[j][t + 1] * B[j][observations[t + 1]] / sum;
+                        }
+                    }
+                }
+
+                for (int i = 0; i < K; i++) {
+                    p[i] = y[i][1];
+                }
+                for (int i = 0; i < K; i++) {
+                    for (int j = 0; j < K; j++) {
+                        double sum1 = 0, sum2 = 0;
+                        for (int t = 0; t < observations.length - 1; t++) {
+                            sum1 += e[i][j][t];
+                            sum2 += y[i][t];
+                        }
+                        A[i][j] = sum1 / sum2;
+                    }
+                }
+                for (int i = 0; i < K; i++) {
+                    for (int j = 0; j < N; j++) {
+                        double sum1 = 0, sum2 = 0;
+                        for (int t = 0; t < observations.length; t++) {
+                            if (j == observations[t]) {
+                                sum1 += y[i][t];
+                            }
+                            sum2 += y[i][t];
+                        }
+                        B[i][j] = sum1 / sum2;
+                    }
+                }
+
+
+
+            }
+            writeToConsole("");
+        }
     }
 
     public void chooseStep() {
@@ -251,5 +423,34 @@ public class GUIManager {
         for (int i = 0; i < r.length; i++) {
             writeToConsole("Score -- " + r[i]);
         }
+    }
+
+    public void loadModel(){
+        String m = io.loadModel();
+        if(m!=null) {
+            s.sLen = p.loadModel(m);
+        }
+    }
+
+    public void saveTrends() {
+        if (selectedComponent instanceof DataComponent &&  ((DataComponent)selectedComponent).getType().equals("trend")) {
+            ArrayList<ArrayList<Double>> arrays = ((Trend)selectedComponent).getArrays();
+            StringBuilder sb = new StringBuilder();
+            for(int i =0; i<arrays.size(); i++){
+                ArrayList<Double> a = arrays.get(i);
+                for(int j =0; j<a.size(); j++){
+                    sb.append(a.get(j));
+                    if(j!=a.size()-1){
+                        sb.append(", ");
+                    }
+                }
+                sb.append("\n");
+            }
+            io.saveCSV(sb.toString());
+        }
+    }
+
+    public void setTotalOption(boolean totalOption) {
+        this.totalOption = totalOption;
     }
 }

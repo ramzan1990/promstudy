@@ -55,9 +55,9 @@ public class PromStudy {
         gm.show();
 
         try {
-            s.positive = FastaParser.parse(new File("data/small_pos.seq"));
-            s.negative = FastaParser.parse(new File("data/small_neg.seq"));
-            s.sequences = FastaParser.parse(new File("data/ATTAS.seq"));
+           //s.positive = FastaParser.parse(new File("data/small_pos.seq"));
+           //s.negative = FastaParser.parse(new File("data/small_neg.seq"));
+           s.sequences = FastaParser.parse(new File("data/ara2K_200.fa"));
         }catch (Exception e){
             e.printStackTrace();
         }
