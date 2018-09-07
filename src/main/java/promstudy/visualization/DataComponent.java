@@ -7,12 +7,12 @@ import javax.swing.JComponent;
 
 public abstract class DataComponent extends JComponent {
 
-    protected int scale = 1, margin = 50, dotSize = 3, step = 50, width, height;
+    protected int scale = 1, margin = 0, dotSize = 3, step = 50, width, height;
     protected Color[] colors;
     protected RenderingHints renderHints;
-    protected static Color backgroundColor = new Color(23, 25, 29);
-    protected static Color gridColor = new Color(32, 33, 36);
-    protected static Color textColor = new Color(204, 204, 204);
+    protected static Color backgroundColor = Color.WHITE;
+    protected static Color gridColor = Color.LIGHT_GRAY;
+    protected static Color textColor = Color.BLACK;
     protected Color decThresholdColor = new Color(131, 204, 107);
     protected int dw, dh;
     private String type;

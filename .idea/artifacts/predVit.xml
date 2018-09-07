@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="predVit">
+    <output-path>$PROJECT_DIR$/out/artifacts/predVit</output-path>
+    <root id="archive" name="predVit.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/meta_predVit/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="promstudy" />
+    </root>
+  </artifact>
+</component>

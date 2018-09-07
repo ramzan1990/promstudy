@@ -3,7 +3,7 @@ package promstudy.visualization;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class Trend extends DataComponent {
+public class Trend2 extends DataComponent {
 
     private int maxCount;
     private double max, min;
@@ -13,8 +13,8 @@ public class Trend extends DataComponent {
     private int offset;
     public static boolean thick = false;
 
-    public Trend(ArrayList<double[]> arrays,
-                 ArrayList<String> names, int wStep) {
+    public Trend2(ArrayList<double[]> arrays,
+                  ArrayList<String> names, int wStep) {
         super("trend");
         this.arrays = arrays;
         this.names = names;
@@ -22,8 +22,8 @@ public class Trend extends DataComponent {
         refresh();
     }
 
-    public Trend(ArrayList<double[]> arrays,
-                 ArrayList<String> names, int wStep, int offset) {
+    public Trend2(ArrayList<double[]> arrays,
+                  ArrayList<String> names, int wStep, int offset) {
         super("trend");
         this.arrays = arrays;
         this.names = names;
@@ -50,7 +50,7 @@ public class Trend extends DataComponent {
                 }
             }
         }
-        if(!thick){
+        if (!thick) {
             max = 1.0;
             min = 0.0;
         }
@@ -59,38 +59,43 @@ public class Trend extends DataComponent {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        margin = 40;
         Graphics2D g2d = (Graphics2D) g;
-        height = getHeight() - margin - step;
+        step = (getHeight() - margin) / (2);
+        height = getHeight() - margin;
         width = getWidth();
         g2d.setRenderingHints(renderHints);
-        g2d.setFont(new Font("Arial", Font.PLAIN, 26));
+        g2d.setFont(new Font("Arial", Font.PLAIN, 30));
         g2d.setColor(backgroundColor);
         g2d.fillRect(0, 0, width, height + step);
-
+        int leftMargin = 90;
         int n = 2;
-        int leftMargin = 80;
+        offset = -5000;
+
         // x-axis
-        xPoint = (double) maxCount / (((double) width - step) / step);
-        if (xPoint != Math.floor(xPoint)) {
-            if (thick) {
-                xPoint = Math.floor(xPoint) + 1;
-            } else {
-                xPoint = Math.floor(xPoint);//+ 1;
-            }
-        }
-        xStep = step / xPoint;
-        for (int i = leftMargin + step; i < width; i += step) {
+        xStep = ((double) width - leftMargin) / (arrays.get(0).length);
+        wStep = (int) (2500 * xStep);
+        for (int i = leftMargin; i < width + wStep; i += wStep) {
             g2d.setColor(gridColor);
             g2d.drawLine(i, height, i, 0);
             g2d.setColor(textColor);
-            double val = offset + (xPoint * (i - leftMargin) / step) * wStep;
+            double val = Math.round(offset + (2500 * (i - leftMargin) / wStep));
             String value = String.valueOf(val);
             if (value.endsWith(".0")) {
                 value = value.substring(0, value.length() - 2);
             }
-            if(i%(2*step)!=0){
-                g2d.drawString(value, i - 6 * (value.length() - 1), height + 15);
+
+
+            if (val == 0) {
+                value = "+1";
+            } else if (val > 0) {
+                value = "+" + value;
             }
+            int l = value.length();
+            if (val > 0) {
+                l++;
+            }
+            g2d.drawString(value, i - 20 * (l - 1), height + 25);
         }
 
         // y-axis
@@ -98,34 +103,33 @@ public class Trend extends DataComponent {
         yStep = step / yPoint;
         for (int i = height - step; i > -3; i -= step) {
             g2d.setColor(gridColor);
-            g2d.drawLine(step, i, width, i);
+            g2d.drawLine(leftMargin, i, width, i);
             g2d.setColor(textColor);
             double val;
-            if(thick) {
+            if (thick) {
                 val = Round(min + yPoint * (height - i) / step, 0);
-            }else{
+            } else {
                 val = Round(min + yPoint * (height - i) / step, 2);
             }
             String value = String.valueOf(val);
             if (value.endsWith(".0")) {
                 value = value.substring(0, value.length() - 2);
             }
-            g2d.drawString(value, step - 25 - n * 5, i + 15);
+            g2d.drawString(value, leftMargin - (n - 1) * 45, i + 22);
 
         }
         g2d.setColor(gridColor);
         g2d.drawLine(0, height, width, height);
-        g2d.drawLine(step, height + step, step, 0);
-        g2d.drawLine(0, height + step - 1, width, height + step - 1);
+        g2d.drawLine(leftMargin, height, leftMargin, 0);
         // drawing margin
-        g2d.setColor(backgroundColor);
-        g2d.fillRect(0, height + step, width, margin);
+        //g2d.setColor(backgroundColor);
+        //g2d.fillRect(0, height + step, width, margin);
         // drawing labels
         g2d.setColor(textColor);
         for (int i = 0; i < arrays.size(); i++) {
             g2d.setColor(colors[i % colors.length]);
-            //g2d.drawString(names.get(i), 5 + (i / 2) * 60, height - 30 + margin
-             //       + 20 * (i % 2) + step);
+            g2d.drawString(names.get(i), 5 + (i / 2) * 60, height - 30 + margin
+                    + 20 * (i % 2) + step);
 
             for (int j = 0; j < arrays.get(i).length; j++) {
                 double v = arrays.get(i)[j];
