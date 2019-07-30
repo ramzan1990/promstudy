@@ -15,7 +15,7 @@ public class PromID {
     private static Predictor p1, p2;
     private static float[][][] sequences;
     private static int step = 1;
-    private static int sLen = 1500;
+    private static int sLen = 600;
     private static int sd = 10;
     private static int minDist = 1000;
     private static String output = "out.txt";
@@ -25,8 +25,8 @@ public class PromID {
     private static double dt2 = 0.5;
     private static int mode = 0;
     private static int ws = 0;
-    private static int head = 0;
-    private static int tail = 0;
+    private static int head = 200;
+    private static int tail = 399;
     private static int matStart = 0;
     private static int matEnd = 0;
     private static double matD = -8.16;
@@ -110,9 +110,9 @@ public class PromID {
 
     public static void analyse() {
         sLen = head + tail + 1;
-        p1 = new Predictor(sLen + File.separator + "model_1");
+        p1 = new Predictor("models" + File.separator + "model_1");
         if (mode > 0) {
-            p2 = new Predictor(sLen + File.separator + "model_2");
+            p2 = new Predictor("models" + File.separator + "model_2");
         }
         ArrayList<float[]> arrays1 = new ArrayList<>();
         ArrayList<float[]> arrays2 = new ArrayList<>();

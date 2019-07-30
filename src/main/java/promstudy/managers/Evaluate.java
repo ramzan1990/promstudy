@@ -17,11 +17,10 @@ import java.util.stream.Stream;
  */
 public class Evaluate {
     static int pos = -1;
-    static int margin = 10;
-    static int sd = 10;
     private static double dt = 0.5;
     private static int minDist = 1000;
     private static int mr = 500;
+    private static int step = 1;
 
     public static void main(String[] args) {
         File setp = null;
@@ -38,7 +37,9 @@ public class Evaluate {
                         minDist = Integer.parseInt(parameter);
                     } else if (option.equals("-mr")) {
                         mr = Integer.parseInt(parameter);
-                    }else {
+                    } else if (option.equals("-step")) {
+                        step = Integer.parseInt(parameter);
+                    } else {
                         System.err.println("Unknown option: " + option);
                         System.err.println("Available Options: ");
                         System.err.println("-setp: predictions from PredSet.jar");
@@ -82,15 +83,13 @@ public class Evaluate {
         int c = 0;
         int t = 0;
         int a = 0;
-        int sd = 251;
-        int step = 1;
         for (int ari = 0; ari < arrays.size(); ari++) {
             boolean nc = true;
             double[] ar = arrays.get(ari);
             ArrayList<Element2> elements = new ArrayList<>();
 
             for (int i = 0; i < ar.length; i++) {
-                elements.add(new Element2(i * step, (float)ar[i], ar[i] > dt));
+                elements.add(new Element2(i * step, (float) ar[i], ar[i] > dt));
             }
             Collections.sort(elements, Collections.reverseOrder());
             ArrayList<Integer> inds = new ArrayList<>();
@@ -117,19 +116,21 @@ public class Evaluate {
             }
         }
         double fp = t;
-        double tn = arrays.size() * (10000 - 1500 - mr*2);
-        double tp =  c;
+        double tn = arrays.size() * (10000 - 600 - mr * 2);
+        double tp = c;
         double fn = arrays.size() - c;
-        double mcc = (tp*tn - fp*fn)/Math.sqrt((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn));
-
-        System.out.println("MCC: " +mcc);
+        double mcc = (tp * tn - fp * fn) / Math.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn));
+        double recall = tp / (tp + fn);
+        double precision = tp / (tp + fp);
+        double f1 = 2*((precision*recall)/(precision+recall));
+        System.out.println("F1: " + f1);
         System.out.println("Total: " + arrays.size());
         System.out.println("Correct: " + c);
-        System.out.println("Recall: " + tp / (tp + fn));
-        System.out.println("Precision: " + tp / (tp + fp));
+        System.out.println("Recall: " + recall);
+        System.out.println("Precision: " + precision);
         System.out.println("False positives: " + t);
         System.out.println("Error rate: " + (t * 100.0 / c) + "%");
-        System.out.println("Error per 1000BP: " + (double)t/(10*arrays.size()));
+        System.out.println("Error per 1000BP: " + (double) t / (10 * arrays.size()));
         System.out.println("True promoter is biggest: " + (a * 100.0 / arrays.size()) + "%");
 
     }

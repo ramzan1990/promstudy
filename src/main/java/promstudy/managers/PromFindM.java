@@ -5,10 +5,7 @@ import promstudy.common.Element2;
 import promstudy.common.FastaParser;
 import promstudy.common.SubSeq;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,6 +40,8 @@ public class PromFindM {
     static int rm;
 
     static int ggg = 0;
+    static StringBuilder tpvsb = new StringBuilder();
+    static StringBuilder tmvsb = new StringBuilder();
 
     public static void main(String[] args) {
         File toPred = null;
@@ -86,52 +85,49 @@ public class PromFindM {
                 }
 
 
-                String[] sets = new String[]{"TATA+", "TATA-", "BOTH"};
-                int[] sps = new int[]{4000, 4700, 4800};
-                int[] wls = new int[]{1500, 750, 251};
-                int[] wss = new int[]{800, 100, 0};
-                int[] mds = new int[]{1000, 300, 500};
+                String[] sets = new String[]{"tata+", "tata-", "both"};
+                int[] mds = new int[]{1000};
                 String[] types = new String[]{"1 model", "2 model", "2 model matrix"};
-                String[] types2 = new String[]{"[-1000 +500]", "[-300 +450]", "[-250 50]"};
                 DecimalFormat df = new DecimalFormat("###.###");
                 System.out.println();
-                for (int d = 0; d  < 2; d++) {
-                    if(d==0){
+                for (int d = 0; d < 2; d++) {
+                    if (d == 0) {
+                        dt1 = 0.5;
                         dt2 = 0.5;
-                    }else{
+                    } else {
+                        dt2 = 0.3;
                         dt2 = 0.3;
                     }
-                    for (int m = 0; m < 3; m++) {
+                    for (int m = 0; m < mds.length; m++) {
                         System.out.println("MinDist = " + mds[m] + "DT = " + dt2);
-                        for (int i = 0; i < 3; i++) {
-                            for (int j = 0; j < 3; j++) {
-                                double[][] res = new double[3][];
-                                for (int s = 0; s < 3; s++) {
-                                    sLen = wls[i];
-                                    ws = wss[i];
-                                    wl = sLen;
-                                    sp = sps[i];
-                                    minDist = mds[m];
-                                    set = sets[s];
-                                    toPred = new File("C:\\Users\\Jumee\\Dropbox\\PromStudy\\PromID\\" + set + ".txt_2");
-                                    Object[] o = FastaParser.parse(toPred, sLen);
-                                    sequences = (float[][][]) o[0];
-                                    names = (ArrayList<String>) o[1];
-                                    res[s] = analyse(j);
-                                }
-                                System.out.print(types[j]);
-                                System.out.print(" ");
-                                System.out.print(types2[i]);
-                                System.out.print(", ");
-                                for (int k = 0; k < res[0].length; k++) {
-                                    System.out.print(df.format(res[0][k]) + ", " + df.format(res[1][k]) + ", " + df.format(res[2][k]));
-                                    if (k != res[0].length - 1) {
-                                        System.out.print(", ");
-                                    }
-                                }
-                                System.out.println();
+                        for (int j = 0; j < 1; j++) {
+                            double[][] res = new double[3][];
+                            for (int s = 0; s < 3; s++) {
+                                sLen = 600;
+                                ws = 0;
+                                wl = sLen;
+                                sp = 4800;
+                                minDist = mds[m];
+                                set = sets[s];
+                                toPred = new File("final_sets" + File.separator + set + ".fa");
+                                Object[] o = FastaParser.parse(toPred, sLen);
+                                sequences = (float[][][]) o[0];
+                                names = (ArrayList<String>) o[1];
+                                res[s] = analyse(1);
                             }
+                            System.out.print(types[j]);
+                            System.out.print(" ");
+                            System.out.print("[-200 +400]");
+                            System.out.print(", ");
+                            for (int k = 0; k < res[0].length; k++) {
+                                System.out.print(df.format(res[0][k]) + "& " + df.format(res[1][k]) + "& " + df.format(res[2][k]));
+                                if (k != res[0].length - 1) {
+                                    System.out.print("& ");
+                                }
+                            }
+                            System.out.println();
                         }
+
                         System.out.println();
                     }
                 }
@@ -139,7 +135,18 @@ public class PromFindM {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
+            try (PrintWriter out = new PrintWriter(new BufferedWriter
+                    (new FileWriter("TATA+_Predictions", false)))) {
+                out.print(tpvsb.toString().trim());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            try (PrintWriter out = new PrintWriter(new BufferedWriter
+                    (new FileWriter("TATA-_Predictions", false)))) {
+                out.print(tmvsb.toString().trim());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -147,7 +154,7 @@ public class PromFindM {
 
         ArrayList<double[]> arrays1 = new ArrayList<>();
         try {
-            FileReader fileReader = new FileReader("C:\\Users\\Jumee\\Dropbox\\PromStudy\\PromID\\" + wl + "\\res_TATA+_" + wl + "_on_" + set + ".txt");
+            FileReader fileReader = new FileReader("final_sets" + File.separator + "tata+_on_" + set + ".res");
             //FileReader fileReader = new FileReader("C:\\Users\\Jumee\\Dropbox\\PromStudy\\PromID\\res_model_PromCNN_on_BOTH.txt");
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line;
@@ -165,7 +172,7 @@ public class PromFindM {
         }
         ArrayList<double[]> arrays2 = new ArrayList<>();
         try {
-            FileReader fileReader = new FileReader("C:\\Users\\Jumee\\Dropbox\\PromStudy\\PromID\\" + wl + "\\res_BOTH_" + wl + "_on_" + set + ".txt");
+            FileReader fileReader = new FileReader("final_sets" + File.separator + "tata-_on_" + set + ".res");
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line;
             while ((line = bufferedReader.readLine()) != null) {
@@ -197,10 +204,10 @@ public class PromFindM {
                 pick(sd2, sd2, ar2, dt2, sb, seq, "", inds, false);
             } else if (m == 1) {
                 pick(sd2, sd2, ar2, dt2, sb, seq, "", inds, false);
-                pick(sd1, sd1, ar1, 0.5, sb, seq, "", inds, false);
+                pick(sd1, sd1, ar1, dt1, sb, seq, "", inds, false);
             } else {
                 pick(sd2, sd2, ar2, dt2, sb, seq, "", inds, false);
-                pick(sd1, sd1, ar1, 0.5, sb, seq, "", inds, true);
+                pick(sd1, sd1, ar1, dt1, sb, seq, "", inds, true);
             }
 
 
@@ -213,7 +220,6 @@ public class PromFindM {
         double tn = arrays1.size() * (10000 - wl - 500 * 2);
         double tp = c;
         double fn = arrays1.size() - c;
-        double mcc = (tp * tn - fp * fn) / Math.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn));
 
         DecimalFormat df = new DecimalFormat("###.###");
 
@@ -237,7 +243,7 @@ public class PromFindM {
         res[1] = fp;
         res[2] = tp / (tp + fn);
         res[3] = tp / (tp + fp);
-        res[4] = mcc;
+        res[4] = 2 * (( res[3] * res[2]) / (res[3] + res[2]));
         res[5] = t / c;
         res[6] = t / (10 * arrays1.size());
         return res;
@@ -322,6 +328,14 @@ public class PromFindM {
                 //sb.append("Position " + (element.get(k).index + 1) + " Score " + element.get(k).value + s1 + "\n" + FastaParser.reverse(toRev));
                 inds.add(element.get(k).index);
                 if (element.get(k).index >= (sp - 500) && element.get(k).index <= (sp + 500)) {
+                    if(set.equals("tata+")){
+                        tpvsb.append(element.get(k).index+201);
+                        tpvsb.append("\n");
+                    }
+                    if(set.equals("tata-")){
+                        tmvsb.append(element.get(k).index+201);
+                        tmvsb.append("\n");
+                    }
                     if (nc) {
                         c++;
                         nc = false;

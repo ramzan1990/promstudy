@@ -11,6 +11,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="imgscalr-lib-4.2" level="project" />
     <orderEntry type="library" name="Maven: org.tensorflow:tensorflow:1.8.0" level="project" />
     <orderEntry type="library" name="Maven: org.tensorflow:libtensorflow:1.8.0" level="project" />
     <orderEntry type="library" name="Maven: org.tensorflow:libtensorflow_jni:1.8.0" level="project" />

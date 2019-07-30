@@ -25,7 +25,7 @@ public class ProfileComponent extends DataComponent {
         super("trend");
         this.arrays = arrays;
         this.names = names;
-        dotSize = 10;
+        dotSize = 14;
         margin = 40;
         refresh();
     }
@@ -131,11 +131,11 @@ public class ProfileComponent extends DataComponent {
             g2d.setStroke(new BasicStroke(2));
             for (int j = 0; j < arrays.get(i).length; j++) {
                 double v = arrays.get(i)[j];
-                g2d.drawRect((int) (v * xStep + leftMargin) - dotSize / 2, (int) Math.round(height - step * i - step) - 2 * dotSize,
-                        dotSize, 4 * dotSize);
+                g2d.drawRect((int) (v * xStep + leftMargin) - dotSize / 4, (int) Math.round(height - step * i - step) - 1 * dotSize,
+                        dotSize/2, 2 * dotSize);
                 g2d.setColor(new Color(g2d.getColor().getRed(), g2d.getColor().getGreen(), g2d.getColor().getBlue(), 55));
-                g2d.fillRect((int) (v * xStep + leftMargin) - dotSize / 2, (int) Math.round(height - step * i - step) - 2 * dotSize,
-                        dotSize, 4 * dotSize);
+                g2d.fillRect((int) (v * xStep + leftMargin) - dotSize / 4, (int) Math.round(height - step * i - step) - 1 * dotSize,
+                        dotSize/2, 2 * dotSize);
                 g2d.setColor(colors[i % colors.length]);
             }
         }
@@ -198,7 +198,7 @@ public class ProfileComponent extends DataComponent {
 
     private static void saveComponent(JComponent jc, File outputfile) throws IOException {
         int width = 850;
-        int height = 800;
+        int height = 400;
         BufferedImage result = new BufferedImage(
                 width, height, //work these out
                 BufferedImage.TYPE_INT_RGB);

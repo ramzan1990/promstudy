@@ -141,11 +141,13 @@ public class Trend3 extends DataComponent {
         g2d.setColor(textColor);
         for (int i = 0; i < arrays.size(); i++) {
             g2d.setColor(colors[i % colors.length]);
-            g2d.setColor(new Color(g2d.getColor().getRed(), g2d.getColor().getGreen(), g2d.getColor().getBlue(), 60));
+            g2d.setColor(new Color(g2d.getColor().getRed(), g2d.getColor().getGreen(), g2d.getColor().getBlue(), 120));
             for (int j = 0; j < arrays.get(i).length; j++) {
                 double v = arrays.get(i)[j];
-                g2d.setStroke(new BasicStroke(1));
-                g2d.fillRect((int) (j * xStep + leftMargin + wStep) - 10, height - (int) Math.round(yStep *v), 21, (int) Math.round(yStep * v));
+                if(v>0.02) {
+                    g2d.setStroke(new BasicStroke(1));
+                    g2d.fillRect((int) (j * xStep + leftMargin + wStep) - 10, height - (int) Math.round(yStep * v), 21, (int) Math.round(yStep * v));
+                }
             }
         }
     }

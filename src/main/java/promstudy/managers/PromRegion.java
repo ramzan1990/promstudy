@@ -1,5 +1,7 @@
 package promstudy.managers;
 
+import promstudy.common.Element2;
+import promstudy.common.Element3;
 import promstudy.common.FastaParser;
 import promstudy.visualization.Trend;
 import promstudy.visualization.Trend2;
@@ -14,12 +16,13 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Random;
 
 /**
  * Created by umarovr on 3/22/18.
  */
-public class PromType3 {
+public class PromRegion {
     private static Predictor p;
     private static float[][][] sequences;
     private static int step = 100;
@@ -72,6 +75,7 @@ public class PromType3 {
         System.out.println("Progress: ");
         for (int i = 0; i < sequences.length; i++) {
             float[][] seq = Arrays.copyOfRange(sequences[i], 4000, 5500);
+           // float[][]  seq = sequences[i];
             int total = (int) Math.ceil((seq.length - step) / step) + 1 + 1;
             float[][][] toPredict = new float[total][sLen][4];
             for (int j = 0; j < toPredict.length - 1; j++) {
@@ -89,8 +93,8 @@ public class PromType3 {
             if ((i + 1) % 10 == 0) {
                 System.out.print((i + 1) + " ");
             }
-            if ((i + 1) > 10) {
-                //break;
+            if ((i + 1) > 1000) {
+                break;
             }
         }
         System.out.println();
@@ -106,9 +110,10 @@ public class PromType3 {
         StringBuilder sbMax = new StringBuilder();
         double[] stMin = new double[(arrays1.get(0).length - 1) * step];
         double[] stMax = new double[(arrays1.get(0).length - 1) * step];
+        ArrayList<Element3> elements = new ArrayList<>();
         for (int ari = 0; ari < arrays1.size(); ari++) {
             sbMin.append("> Sequence " + ari + "\n");
-
+            sbMax.append("> Sequence " + ari + "\n");
             double max = -Double.MAX_VALUE;
             double min = Double.MAX_VALUE;
             double sMin = 0;
@@ -137,24 +142,21 @@ public class PromType3 {
                     minS = FastaParser.reverse(Arrays.copyOfRange(sequences[ari], c * step, c * step + step));
                     sMin = c * step;
                 }
-                if(ar1[c] >= maxScore) {
+                stMin[c * step] = (stMin[c * step] + (maxScore - ar1[c]));
+                if (ar1[c] >= maxScore) {
                     //stMax[c * step] = (stMax[c * step] + (ar1[c]-maxScore));
-                    stMax[c * step] = (stMax[c * step] + (ar1[c]-maxScore));
-                }else {
+                   // stMax[c * step] = (stMax[c * step] + (ar1[c] - maxScore));
+                } else {
                     //stMax[c * step] = (stMax[c * step] + (maxScore - ar1[c]));
-                    stMin[c * step] =  (stMin[c * step] + (maxScore - ar1[c]));
+                  //  stMin[c * step] = (stMin[c * step] + (maxScore - ar1[c]));
                 }
             }
 
-            if(sMax > 900 && sMax<1000){
-                sbMax.append("> Sequence " + ari + "\n");
-                sbMax.append(FastaParser.reverse(Arrays.copyOfRange(sequences[ari], 900, 1000)));
-                if(ari!=arrays1.size()-1){
-                    sbMax.append("\n");
-                }
-            }
+            sbMax.append(maxS + "\n");
 
             sbMin.append(minS + "\n");
+
+            elements.add(new Element3(maxS, max));
             array1.add(t);
             array1.add(t2);
             //trends[ti++] = new Trend(array1, names, step);
@@ -169,30 +171,36 @@ public class PromType3 {
 //            }
 
         }
+        Collections.sort(elements, Collections.reverseOrder());
+        System.out.println();
+        for(int i = 0; i<1000; i++){
+            System.out.println(elements.get(i).seq);
+        }
+        System.out.println();
         ArrayList<String> n = new ArrayList<>();
         n.add("max");
         n.add("min");
         double max = -Double.MAX_VALUE;
         double min = Double.MAX_VALUE;
-        for(double d: stMax){
-            if(d>max){
+        for (double d : stMax) {
+            if (d > max) {
                 max = d;
             }
-            if(d<min){
+            if (d < min) {
                 min = d;
             }
         }
-        for(double d: stMin){
-            if(d>max){
+        for (double d : stMin) {
+            if (d > max) {
                 max = d;
             }
-            if(d<min){
+            if (d < min) {
                 min = d;
             }
         }
-        for(int i = 0; i<stMax.length; i++){
-            stMax[i]  = (stMax[i] - min)/(max - min);
-            stMin[i]  = (stMin[i] - min)/(max - min);
+        for (int i = 0; i < stMax.length; i++) {
+            stMax[i] = (stMax[i] - min) / (max - min);
+            stMin[i] = (stMin[i] - min) / (max - min);
         }
         ArrayList<double[]> array1 = new ArrayList<>();
         array1.add(stMax);
@@ -207,16 +215,16 @@ public class PromType3 {
         }
         //System.out.println(stMax);
         //System.out.println(stMin);
-//        try (PrintWriter out = new PrintWriter("sbMin.fasta")) {
-//            out.print(sbMin.toString());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        try (PrintWriter out = new PrintWriter("sbMax.fasta")) {
-//            out.print(sbMax.toString());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        try (PrintWriter out = new PrintWriter("sbMin.fasta")) {
+            out.print(sbMin.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try (PrintWriter out = new PrintWriter("sbMax.fasta")) {
+            out.print(sbMax.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private static void saveComponents(JComponent c[], String format, File outputfile) throws IOException {

@@ -42,10 +42,11 @@ public class Predictor {
             Tensor in1 = Tensor.create(shape, makeFloatBuffer(subSeq));
             float t = 1;
             Tensor in2 = Tensor.create(t);
-            Tensor out = s.runner().feed("input_prom", in1).feed("Placeholder_1", in2).fetch("output_prom").run().get(0);
-            float[][] temp = (float[][]) out.copyTo(new float[subSeq.length][2]);
+            Tensor out = s.runner().feed("input_prom", in1).feed("kr1", in2).feed("kr2", in2).fetch("output_prom").run().get(0);
+            float[][] temp = (float[][]) out.copyTo(new float[subSeq.length][1]);
+            //float[][] temp = (float[][]) out.copyTo(new float[subSeq.length][2]);
             for (int i = 0; i < temp.length; i++) {
-                result[b * batchSize + i] = (temp[i][0] - temp[i][1] + 1) / 2;
+                result[b * batchSize + i] = temp[i][0];
             }
             in1.close();
             in2.close();

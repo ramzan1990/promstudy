@@ -3,6 +3,7 @@ package promstudy.common;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Scanner;
 
 public class FastaParser {
@@ -23,25 +24,26 @@ public class FastaParser {
         ArrayList<float[][]> fa = new ArrayList<>();
         ArrayList<String> names = new ArrayList<>();
         Scanner s = new Scanner(f);
-        String seq = "";
+        StringBuilder seq = new StringBuilder();
         String name = "";
         while(s.hasNextLine()){
             String line = s.nextLine();
             if(line.startsWith(">")){
                 if(seq.length()>=minSize){
-                    fa.add(encode(seq));
+                    fa.add(encode(seq.toString()));
                     names.add(name);
                 }
                 name = line;
-                seq = "";
+                seq = new StringBuilder();
             }else {
-                seq+=line;
+                seq.append(line);
             }
         }
         if(seq.length()>=minSize){
-            fa.add(encode(seq));
+            fa.add(encode(seq.toString()));
             names.add(name);
         }
+        Collections.shuffle(fa);
         float[][][] result = new float[fa.size()][][];
         for(int i =0; i<fa.size(); i++){
             result[i] = fa.get(i);
