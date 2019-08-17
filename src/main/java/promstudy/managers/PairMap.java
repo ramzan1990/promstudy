@@ -1,5 +1,8 @@
 package promstudy.managers;
 
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.RealMatrix;
+import promstudy.clustering.KMeansMatrices;
 import promstudy.common.FastaParser;
 import promstudy.visualization.PairMapComp;
 import promstudy.visualization.SalMapComp;
@@ -11,6 +14,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -27,10 +31,10 @@ public class PairMap {
     private static ArrayList<String> names;
     private static double dt = 0.5;
     private static int count = 1;
-    static int w = 5 * 201;
-    static int h = 5 * 201;
+    static int w = 30 * 201;
+    static int h = 30 * 201;
     private static boolean ignoreCore = false;
-    private static int numSeq = 100;
+    private static int numSeq = 4000;
 
     public static void main(String[] args) {
         File toPred = null;
@@ -45,9 +49,9 @@ public class PairMap {
                         p = new Predictor(parameter);
                     } else if (option.equals("-out")) {
                         output = parameter;
-                    }else if (option.equals("-core")) {
+                    } else if (option.equals("-core")) {
                         ignoreCore = Integer.parseInt(parameter) == 0;
-                    }else if (option.equals("-ns")) {
+                    } else if (option.equals("-ns")) {
                         numSeq = Integer.parseInt(parameter);
                     } else {
                         System.err.println("Unknown option: " + option);
@@ -84,8 +88,8 @@ public class PairMap {
             for (int j = 0; j < toPredict.length - 1; j++) {
                 float[][] seq2 = cloneArray(seq);
                 float[] tmp = seq2[start + j].clone();
-                for(int d =0;d<tmp.length;d++){
-                    if(tmp[d]==1){
+                for (int d = 0; d < tmp.length; d++) {
+                    if (tmp[d] == 1) {
                         tmp[d] = 0;
                     }
                 }
@@ -95,7 +99,7 @@ public class PairMap {
             toPredict[toPredict.length - 1] = seq;
             arrays1.add(p.predict(toPredict));
 
-            total = (anLen * anLen - anLen) / 2 ;
+            total = (anLen * anLen - anLen) / 2;
             toPredict = new float[total][sLen][4];
             int ind = 0;
             for (int r = 0; r < anLen; r++) {
@@ -127,7 +131,7 @@ public class PairMap {
                 System.out.print((i + 1) + " ");
             }
         }
-        double[][] data = new double[anLen][anLen];
+        ArrayList<RealMatrix> results = new ArrayList<>();
         for (int ari = 0; ari < arrays1.size(); ari++) {
             float[][] seq = sequences[ari];
             float[] ar1 = arrays1.get(ari);
@@ -135,27 +139,28 @@ public class PairMap {
             double maxScore = ar1[ar1.length - 1];
 
             int ind = 0;
-
+            double[][] data = new double[anLen][anLen];
             for (int r = 0; r < anLen; r++) {
                 for (int j = 0; j < r; j++) {
                     data[r][j] += Math.abs(maxScore - ar2[ind++])/(Math.abs(maxScore - ar1[r]) + Math.abs(maxScore - ar1[j]));
+                    //data[r][j] = Math.abs(maxScore - ar2[ind++]);
+                    //kmeans cluster
                 }
             }
+            results.add(new Array2DRowRealMatrix(data));
         }
 
-        for(int i = 0; i<anLen; i++){
-           for(int j =0; j < anLen; j++){
-               data[i][j] /= numSeq;
-           }
-        }
+        ArrayList<RealMatrix> clusters = KMeansMatrices.freqMatrix(results);
+
 
         Trend.thick = true;
-        try {
-            saveComponents(new PairMapComp[]{new PairMapComp(data)}, "png", new File(output + "_pair_map.png"));
-        } catch (Exception e) {
-            e.printStackTrace();
+        for (int i = 0; i < clusters.size(); i++) {
+            try {
+                saveComponents(new PairMapComp[]{new PairMapComp(clusters.get(i).getData())}, "png", new File(output + "_pair_map_" + i + ".png"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-
     }
 
     private static void saveComponents(JComponent c[], String format, File outputfile) throws IOException {

@@ -65,7 +65,7 @@ public class PairMapComp extends DataComponent {
         g2d.setColor(backgroundColor);
         g2d.fillRect(0, 0, width, height);
         g2d.setColor(textColor);
-        step = 5;
+        step = 30;
 
         for (int i = 0; i < array.length; i++) {
             for(int j =0; j < array[i].length; j++) {
@@ -81,9 +81,12 @@ public class PairMapComp extends DataComponent {
                 }
 
                 g2d.fillRect(step * j, step * i, step, step);
+                g2d.setFont(new Font("Arial", Font.PLAIN, 9));
+                g2d.setColor(Color.BLACK);
+                g2d.drawString((i+1)+"", step * j + 10, step * i + 10);
+                g2d.drawString((j+1)+"", step * j + 10, step * i + 20);
             }
-            //g2d.setFont(new Font("Arial", Font.PLAIN, 9));
-            //g2d.setColor(Color.BLACK);
+
             //String result = String.format("%.4f", array[i]);
             //g2d.drawString(result, step + (i/4) * step, height - (5*step - step*(i%4)));
             //g2d.setFont(origFont);
