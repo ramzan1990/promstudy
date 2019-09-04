@@ -34,7 +34,7 @@ public class PairMap {
     static int w = 30 * 201;
     static int h = 30 * 201;
     private static boolean ignoreCore = false;
-    private static int numSeq = 4000;
+    private static int numSeq = 500; //7900
 
     public static void main(String[] args) {
         File toPred = null;
@@ -131,6 +131,9 @@ public class PairMap {
                 System.out.print((i + 1) + " ");
             }
         }
+        double max = -Double.MAX_VALUE;
+        double min = Double.MAX_VALUE;
+        double[][] total = new double[anLen][anLen];
         ArrayList<RealMatrix> results = new ArrayList<>();
         for (int ari = 0; ari < arrays1.size(); ari++) {
             float[][] seq = sequences[ari];
@@ -142,13 +145,35 @@ public class PairMap {
             double[][] data = new double[anLen][anLen];
             for (int r = 0; r < anLen; r++) {
                 for (int j = 0; j < r; j++) {
-                    data[r][j] += Math.abs(maxScore - ar2[ind++])/(Math.abs(maxScore - ar1[r]) + Math.abs(maxScore - ar1[j]));
+                    //if(maxScore > ar1[r] && maxScore > ar1[j]) {
+                        Double v = Math.abs(maxScore - ar2[ind++]) - Math.abs(maxScore - ar1[r] + maxScore - ar1[j]);
+                        if(!v.isNaN()) {
+                            if(v > max){
+                                max = v;
+                            }
+                            if(v < min){
+                                min = v;
+                            }
+                            data[r][j] += v;
+                            total[r][j] += v;
+                        }
+                    //}
                     //data[r][j] = Math.abs(maxScore - ar2[ind++]);
                     //kmeans cluster
                 }
             }
             results.add(new Array2DRowRealMatrix(data));
         }
+        System.out.println(max + "  " + min);
+
+        RealMatrix tm = new Array2DRowRealMatrix(total);
+        tm = tm.scalarMultiply(1.0/arrays1.size());
+        try {
+            saveComponents(new PairMapComp[]{new PairMapComp(tm.getData())}, "png", new File(output + "_pair_map_total.png"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
 
         ArrayList<RealMatrix> clusters = KMeansMatrices.freqMatrix(results);
 

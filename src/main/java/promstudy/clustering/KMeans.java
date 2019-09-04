@@ -16,10 +16,10 @@ public class KMeans {
     public static int maxSize = 5000000;
     private static int seqLen = 15;
 
-    public static ArrayList<RealMatrix> freqMatrix(ArrayList<Sequence> input) {
+    public static ArrayList<RealMatrix> freqMatrix(ArrayList<Sequence> input, int tss) {
         seqLen = input.get(0).seq.length;
         Collections.sort(input);
-        Collections.reverse(input);
+        //Collections.reverse(input);
         System.out.println(input.size());
         input.subList((int) (0.05 * input.size()), input.size()).clear();
         System.out.println(input.size());
@@ -30,21 +30,21 @@ public class KMeans {
         Sequence[] means = new Sequence[k];
         ArrayList<Integer> ki = new ArrayList<>();
 
-        int rn =0;
+        int rn = 0;
         ki.add(rn++);
         while (ki.size() != k) {
             double best = 0;
-            for(int c : ki){
+            for (int c : ki) {
                 double score = score(s[c].seq, s[rn].seq);
-                if(score > best){
+                if (score > best) {
                     best = score;
                 }
             }
-            if(best < seqLen/2 + 1){
+            if (best < seqLen / 2 + 1) {
                 ki.add(rn);
             }
             rn++;
-            if(rn >= s.length){
+            if (rn >= s.length) {
                 k = ki.size();
                 break;
             }
@@ -67,23 +67,39 @@ public class KMeans {
                 means[j] = mean(clusters[j]);
             }
         }
-
-        double bestScore = -1;
-        int bestCluster = -1;
+        /// Math.log(1.5)
         for (int i = 0; i < k; i++) {
+            for (int j = 0; j < clusters[i].size(); j++) {
+                clusters[i].get(j).sim = score(means[i].seq, clusters[i].get(j).seq) * (1.0 / (Math.log(Math.abs(means[i].p - clusters[i].get(j).p) + 1) + 1));
+            }
+            Collections.sort(clusters[i], (o1, o2) -> o1.sim.compareTo(o2.sim));
+            Collections.reverse(clusters[i]);
+            clusters[i].subList((int) (0.5 * clusters[i].size()), clusters[i].size()).clear();
+
+            means[i] = mean(clusters[i]);
+
+            for (int j = clusters[i].size() - 1; j >=0; j--) {
+                if(Math.abs(means[i].p - clusters[i].get(j).p) > 100){
+                    clusters[i].remove(j);
+                }
+                if(j%50==0){
+                    means[i] = mean(clusters[i]);
+                }
+            }
+
+            for (int j = 0; j < clusters[i].size(); j++) {
+                clusters[i].get(j).sim = score(means[i].seq, clusters[i].get(j).seq) * (1.0 / (Math.log(Math.abs(means[i].p - clusters[i].get(j).p) + 1) + 1));
+            }
+            Collections.sort(clusters[i], (o1, o2) -> o1.sim.compareTo(o2.sim));
+            Collections.reverse(clusters[i]);
+            clusters[i].subList((int) (0.5 * clusters[i].size()), clusters[i].size()).clear();
+
             double score = 0;
-            int p = 0;
-            for (int j = 0; j < clusters[i].size() && j < maxSize; j++) {
+            for (int j = 0; j < clusters[i].size(); j++) {
                 score += clusters[i].get(j).v;
-                p += clusters[i].get(j).p;
             }
-            p /= clusters[i].size();
             //score/= clusters[i].size();
-            System.out.println("Cluster (" + (i + 1) + ") size " + clusters[i].size() + " score " + score + " location " + p);
-            if (score > bestScore) {
-                bestScore = score;
-                bestCluster = i;
-            }
+            System.out.println("Cluster (" + (i + 1) + ") size " + clusters[i].size() + " effect " + score / clusters[i].size() + " location " + getPosition(tss, clusters[i]));
         }
         // bestCluster = Integer.parseInt(JOptionPane.showInputDialog("123"));
         ArrayList<RealMatrix> fms = new ArrayList<>();
@@ -115,14 +131,14 @@ public class KMeans {
         for (int i = 0; i < seqLen; i++) {
             mean[i] = findPopular(count[i]);
         }
-        return new Sequence(mean, 0, (int)(p/cluster.size()));
+        return new Sequence(mean, 0, (int) (p / cluster.size()));
     }
 
     private static int closest(Sequence is, Sequence[] means) {
         double bestScore = -1;
         int index = -1;
         for (int i = 0; i < means.length; i++) {
-            double score = score(means[i].seq, is.seq) * (1.0 / (Math.log(Math.abs(means[i].p - is.p) + 1)) );
+            double score = score(means[i].seq, is.seq) * (1.0 / (Math.log(Math.abs(means[i].p - is.p) + 1) / Math.log(1.5) + 1));
             if (score > bestScore) {
                 bestScore = score;
                 index = i;
@@ -170,4 +186,30 @@ public class KMeans {
 
     }
 
+    public static String getPosition(int tss, ArrayList<Sequence> cluster) {
+        int min = Integer.MAX_VALUE;
+        int max = -Integer.MAX_VALUE;
+        for (Sequence p : cluster) {
+            if (p.p > max) {
+                max = p.p;
+            }
+            if (p.p < min) {
+                min = p.p;
+            }
+        }
+        String l = "";
+        if (min < tss) {
+            l = "[" + (min - tss);
+        } else {
+            l = "[+" + (min - tss + 1);
+        }
+
+        String r = "";
+        if (max < tss) {
+            r = (max - tss) + "]";
+        } else {
+            r = "+" + (max - tss + 1) + "]";
+        }
+        return l + " : " + r;
+    }
 }

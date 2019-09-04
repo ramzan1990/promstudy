@@ -56,32 +56,7 @@ public class LogoComponent extends JComponent {
 		//colors.add(Color.BLACK);
 		colors.add(Color.decode("#ed7569"));
 
-		colors.add(Color.decode("#B0171F"));
-		colors.add(Color.decode("#DC143C"));
-		colors.add(Color.decode("#CD919E"));
-		colors.add(Color.decode("#FF82AB"));
-		colors.add(Color.decode("#CDC1C5"));
-		colors.add(Color.decode("#8B2252"));
-		colors.add(Color.decode("#DA70D6"));
-		colors.add(Color.decode("#483D8B"));
-		colors.add(Color.decode("#000080"));
-		colors.add(Color.decode("#708090"));
-		colors.add(Color.decode("#00BFFF"));
-		colors.add(Color.decode("#00868B"));
-		colors.add(Color.decode("#00FA9A"));
-		colors.add(Color.decode("#2E8B57"));
-		colors.add(Color.decode("#228B22"));
-		colors.add(Color.decode("#6B8E23"));
-		colors.add(Color.decode("#EEEE00"));
-		colors.add(Color.decode("#FFD700"));
-		colors.add(Color.decode("#FFA500"));
-		colors.add(Color.decode("#8B7355"));
-		colors.add(Color.decode("#EE4000"));
-		colors.add(Color.decode("#CD4F39"));
-		colors.add(Color.decode("#F5DEB3"));
-		colors.add(Color.decode("#8B864E"));
-		colors.add(Color.decode("#79CDCD"));
-		colors.add(Color.decode("#551A8B"));
+
 		//Collections.shuffle(colors);
 
 		renderHints = new RenderingHints(RenderingHints.KEY_ANTIALIASING,

@@ -5,13 +5,15 @@ import org.imgscalr.Scalr;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class PairMapComp extends DataComponent {
 
     private int maxCount;
-    private double max, min;
+    private double max, min, mid;
     private double[][] array;
     private double wStep;
     private int offset;
@@ -24,24 +26,38 @@ public class PairMapComp extends DataComponent {
 
         max = -Double.MAX_VALUE;
         min = Double.MAX_VALUE;
-        for(int i = 0; i<array.length; i++){
-            for(int j =0; j < array[i].length; j++){
-                double d = Math.abs(array[i][j] - 1);
-                if(d > max){
+        ArrayList<Double> vals = new ArrayList<>();
+
+        for (int i = 0; i < array.length; i++) {
+            for (int j = 0; j < array[i].length; j++) {
+                double d = Math.log(Math.abs(7000*array[i][j]) + 1)/Math.log(10);
+                if (array[i][j] < 0) {
+                    d = -1 * d;
+                }
+                if (d == 0 || Double.isNaN(d)) {
+                    continue;
+                }
+                array[i][j] = d;
+
+                if (d > max) {
                     max = d;
                 }
-                if(d < min){
+                if (d < min) {
                     min = d;
                 }
+                vals.add(d);
             }
         }
-
+        Collections.sort(vals);
+        //mid = vals.get(vals.size() / 2);
+        mid = 0;
+        //System.out.println(max + " " + mid + " " + min);
 
         customColors = new HashMap<>();
         customColors.put("A", Color.decode("#228B22"));
-        customColors.put("T",Color.decode("#e62200")  );
+        customColors.put("T", Color.decode("#e62200"));
         customColors.put("G", Color.ORANGE);
-        customColors.put("C",Color.decode("#00008B"));
+        customColors.put("C", Color.decode("#00008B"));
     }
 
 
@@ -68,23 +84,27 @@ public class PairMapComp extends DataComponent {
         step = 30;
 
         for (int i = 0; i < array.length; i++) {
-            for(int j =0; j < array[i].length; j++) {
-                if(array[i][j] == 0){
+            for (int j = 0; j < array[i].length; j++) {
+                if (array[i][j] == 0) {
                     continue;
                 }
-                if (array[i][j] > 1) {
+                if (array[i][j] > mid) {
                     g2d.setColor(colors[0]);
-                    g2d.setColor(new Color(g2d.getColor().getRed(), g2d.getColor().getGreen(), g2d.getColor().getBlue(), (int) Math.floor(255 * ( Math.abs(array[i][j] - 1) / max))));
-                } else {
+                    g2d.setColor(new Color(g2d.getColor().getRed(), g2d.getColor().getGreen(), g2d.getColor().getBlue(),
+                            (int) Math.floor(255 * (Math.abs(array[i][j] - mid) / (max - mid)))));
+                } else if (array[i][j] < mid) {
                     g2d.setColor(colors[1]);
-                    g2d.setColor(new Color(g2d.getColor().getRed(), g2d.getColor().getGreen(), g2d.getColor().getBlue(), (int) Math.floor(255 * (Math.abs(1 - array[i][j]) / max))));
+                    g2d.setColor(new Color(g2d.getColor().getRed(), g2d.getColor().getGreen(), g2d.getColor().getBlue(),
+                            (int) Math.floor(255 * (Math.abs(array[i][j] - mid) / Math.abs(min - mid)))));
+                } else {
+                    g2d.setColor(Color.WHITE);
                 }
 
                 g2d.fillRect(step * j, step * i, step, step);
                 g2d.setFont(new Font("Arial", Font.PLAIN, 9));
                 g2d.setColor(Color.BLACK);
-                g2d.drawString((i+1)+"", step * j + 10, step * i + 10);
-                g2d.drawString((j+1)+"", step * j + 10, step * i + 20);
+                g2d.drawString((i + 1) + "", step * j + 10, step * i + 10);
+                g2d.drawString((j + 1) + "", step * j + 10, step * i + 20);
             }
 
             //String result = String.format("%.4f", array[i]);
